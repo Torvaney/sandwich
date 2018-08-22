@@ -22,7 +22,10 @@
 
 (deftest nelder-mead-test
   (testing "Nelder-Mead minimisation"
-    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [0   0]))
-    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [5  -1]))
-    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [10  2]))
-    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [-1 -1]))))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [0     0]))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [5    -1]))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [15    2]))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [-9   -9]))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [5.2 1.2]))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [10    2]))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [-1   -1]))))
