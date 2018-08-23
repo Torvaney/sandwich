@@ -56,7 +56,7 @@
   (m/add xa (m/mul p (m/sub xa xw))))
 
 
-;; Evaluating the points on the simplex
+;; Evaluate the points on the simplex
 
 (defn- eval-point
   "Evaluate a single point"
@@ -69,7 +69,7 @@
   (mapv #(eval-point f %) x))
 
 
-;; Updating the simplex
+;; Update the simplex
 
 (defn- shrink-point
   "Shrink a single point on the simplex."
@@ -92,9 +92,10 @@
   "Expand simplex and update accordingly"
   [f p xa xb xr sorted]
   (let [xe (eval-point f (expand p (:x xr) (:x xa)))]
-    (if (< (:f xe) (:f xb))
-      (accept-point sorted xe)
-      (accept-point sorted xr))))
+    (cond
+      (< (:f xr) (:f xe)) (accept-point sorted xr)
+      (< (:f xe) (:f xb)) (accept-point sorted xe)
+      true                (accept-point sorted xr))))
 
 (defn- contract-inside-and-update
   "Contract simplex inside and update accordingly"
@@ -147,5 +148,3 @@
       (if (converged? 0.00000001 s)
         (first s)
         (recur (iter-simplex f s))))))
-
-
