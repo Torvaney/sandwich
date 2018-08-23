@@ -115,8 +115,6 @@
 
 ;; Iterate
 
-(defn print-log [x] (do (println x) x))
-
 (defn- iter-simplex
   "Find the next iteration of the simplex."
   [f sorted]
