@@ -2,6 +2,9 @@
   (:require [clojure.test :refer :all]
             [sandwich.core :refer :all]))
 
+
+;; Example objective functions
+
 (defn- sq [x] (Math/pow x 2))
 
 (defn- build-rosenbrock
@@ -9,6 +12,16 @@
   (fn [[x y]]
     (+ (sq (- a x))
        (* b (sq (- y (sq x)))))))
+
+(defn- build-polynomial
+  [a b c]
+  (fn [[x]]
+    (+ (* a (sq x))
+       (* b x)
+       c)))
+
+
+;; Tests and helper fns
 
 (defn- close? [tolerance x y]
   (< (Math/abs (- x y)) tolerance))
@@ -28,4 +41,8 @@
     (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [-9   -9]))
     (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [5.2 1.2]))
     (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [10    2]))
-    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [-1   -1]))))
+    (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [-1   -1]))
+    (is (test-optim (build-polynomial 1  0 0) nelder-mead [0]  [-1]))
+    (is (test-optim (build-polynomial 3  0 8) nelder-mead [0]  [10]))
+    ; (is (test-optim (build-polynomial 2  4 2) nelder-mead [-1] [-10]))
+    (is (test-optim (build-polynomial 1 -4 1) nelder-mead [2]  [7.8]))))
