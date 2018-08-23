@@ -1,0 +1,11 @@
+#
+# Continuous Deployment Script
+#
+
+branches:
+  only:
+    - master
+
+language: clojure
+
+script: lein test
