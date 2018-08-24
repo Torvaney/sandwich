@@ -144,10 +144,10 @@
     true                 (contract-outside-and-update f 0.5 xa xr xw sorted))))
 
 (defn- converged?
-  [tol sorted]
-  (let [xb (first sorted)
-        xw (last sorted)]
-    (< (- (:f xw) (:f xb)) tol)))
+  [tol s1 s2]
+  (let [x1 (last s1)
+        x2 (last s2)]
+    (< (Math/abs (- (:f x1) (:f x2))) tol)))
 
 (defn nelder-mead
   "Optimise f"
@@ -155,6 +155,7 @@
   (let [x      (init-simplex x0)
         sorted (->> x (eval-simplex f) (sort-by :f))]
     (loop [s sorted]
-      (if (converged? 0.00000001 s)
-        (first s)
-        (recur (iter-simplex f s))))))
+      (let [s-next (iter-simplex f s)]
+        (if (converged? 1e-12 s s-next)
+          (first s-next)
+          (recur s-next))))))
