@@ -4,7 +4,7 @@
             [clojure.core.matrix.stats :as ms]))
 
 
-;; Initialise simplex
+;; Initialise simplex ----------------------------------------------------------
 
 (defn- find-b
   [c n]
@@ -16,24 +16,27 @@
   (+ b (/ c (Math/sqrt 2))))
 
 (defn- init-simplex
-  "Initialise an equilateral n+1 dimensional simplex."
-  [x]
-  (let [c 1
-        n (count x)
-        b (find-b c n)
-        a (find-a c b)]
-    (->> (cons a (repeat (- n 1) b))
-         clojure.math.combinatorics/permutations
-         (mapv #(m/add x %))
-         (cons (m/matrix x)))))
+  "Initialise an equilateral, n+1 simplex from a starting set of parameter
+   values, with side-length of c (defaults to 1)."
+  ([x] (init-simplex 1 x))
+  ([c x]
+   (let [n (count x)
+         b (find-b c n)
+         a (find-a c b)]
+     (->> (cons a (repeat (- n 1) b))
+          clojure.math.combinatorics/permutations
+          (mapv #(m/add x %))
+          (cons (m/matrix x))))))
 
 
-;; Simplex operations (finding new points)
-; Arguments are named according to the following convention:
-; xa: average of all points aside from the worst
-; xb: best point
-; xl: second worst ("lousy") point
-; xw: worst point
+;; Finding new points from the simplex -----------------------------------------
+
+;; Co-ordinate arguments are named according to the following convention:
+;;  xb: best point
+;;  xl: second worst ("lousy") point
+;;  xw: worst point
+;;  xa: average of all points aside from the worst
+;;  xr: reflected point
 
 (defn- reflect
   "Reflect simplex and return the reflected point."
@@ -56,7 +59,15 @@
   (m/add xa (m/mul p (m/sub xa xw))))
 
 
-;; Evaluate the points on the simplex
+;; Evaluate the points on the simplex ------------------------------------------
+
+;; It is useful to store points (a set of parameter values) along with the
+;; evaluated function value at that point. The main advantage is that this
+;; means that each point only needs to be evaluated once. We store each point in
+;; a map with the following keys:
+;;  :x - the parameter values   (vector)
+;;  :f - the evaluated function (double)
+
 
 (defn- eval-point
   "Evaluate a single point"
@@ -69,7 +80,9 @@
   (mapv #(eval-point f %) x))
 
 
-;; Update the simplex
+;; Update the simplex ----------------------------------------------------------
+
+;; Find some new point on the simplex and update the simplex, accordingly
 
 (defn- shrink-point
   "Shrink a single point on the simplex."
@@ -114,7 +127,7 @@
       (shrink f p sorted))))
 
 
-;; Iterate
+;; Nelder Mead minimisation ----------------------------------------------------
 
 (defn- iter-simplex
   "Find the next iteration of the simplex."
@@ -129,9 +142,6 @@
     (<= (:f xr) (:f xl)) (accept-point sorted xr)
     (>  (:f xr) (:f xw)) (contract-inside-and-update f 0.5 xa xw sorted)
     true                 (contract-outside-and-update f 0.5 xa xr xw sorted))))
-
-
-;; Do the thing
 
 (defn- converged?
   [tol sorted]
