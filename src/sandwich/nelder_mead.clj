@@ -1,4 +1,4 @@
-(ns sandwich.core
+(ns sandwich.nelder-mead
   (:require [clojure.math.combinatorics]
             [clojure.core.matrix :as m]
             [clojure.core.matrix.stats :as ms]))
@@ -137,11 +137,11 @@
         xb     (first sorted)
         xa     (->> sorted drop-last (map :x) ms/mean m/matrix (eval-point f))
         xr     (eval-point f (reflect 1 (:x xa) (:x xw)))]
-  (cond
-    (<  (:f xr) (:f xb)) (expand-and-update f 1 xa xb xr sorted)
-    (<= (:f xr) (:f xl)) (accept-point sorted xr)
-    (>  (:f xr) (:f xw)) (contract-inside-and-update f 0.5 xa xw sorted)
-    true                 (contract-outside-and-update f 0.5 xa xr xw sorted))))
+    (cond
+      (<  (:f xr) (:f xb)) (expand-and-update f 1 xa xb xr sorted)
+      (<= (:f xr) (:f xl)) (accept-point sorted xr)
+      (>  (:f xr) (:f xw)) (contract-inside-and-update f 0.5 xa xw sorted)
+      true                 (contract-outside-and-update f 0.5 xa xr xw sorted))))
 
 (defn- converged?
   [tol s1 s2]
@@ -149,7 +149,7 @@
         x2 (last s2)]
     (< (Math/abs (- (:f x1) (:f x2))) tol)))
 
-(defn nelder-mead
+(defn optimise
   "Optimise f"
   [f x0]
   (let [x      (init-simplex x0)
@@ -159,3 +159,6 @@
         (if (converged? 1e-12 s s-next)
           (first s-next)
           (recur s-next))))))
+
+;; For the yanks
+(def optimize optimise)
