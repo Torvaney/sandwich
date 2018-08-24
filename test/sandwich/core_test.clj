@@ -44,5 +44,8 @@
     (is (test-optim (build-rosenbrock 1 100) nelder-mead [1 1] [-1   -1]))
     (is (test-optim (build-quadratic 1  0 0) nelder-mead [0]  [-1]))
     (is (test-optim (build-quadratic 3  0 8) nelder-mead [0]  [10]))
+    (is (test-optim (build-quadratic 1 -4 0) nelder-mead [2]  [1000]))
+    (is (test-optim (build-quadratic 1  4 3) nelder-mead [-2] [-18]))
+    (is (test-optim (build-quadratic 5 10 1) nelder-mead [-1] [10]))
     (is (test-optim (build-quadratic 2  4 2) nelder-mead [-1] [-10]))
     (is (test-optim (build-quadratic 1 -4 1) nelder-mead [2]  [7.8]))))
