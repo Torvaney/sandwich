@@ -1,5 +1,6 @@
-(ns sandwich.nelder-mead-test
+(ns sandwich.core-test
   (:require [clojure.test :refer :all]
+            [sandwich.genetic :as genetic]
             [sandwich.nelder-mead :as nelder-mead]))
 
 
@@ -23,8 +24,13 @@
 
 ;; Tests and helper fns
 
+
 (defn- close? [tolerance x y]
   (< (Math/abs (- x y)) tolerance))
+
+
+(defn print-log [x] (do (println x) x))
+
 
 (defn- test-optim
   [f op x-true x0]
@@ -32,6 +38,7 @@
         x-est  (:x result)]
     (->> (mapv #(close? 0.001 %1 %2) x-true x-est)
          (every? true?))))
+
 
 (deftest nelder-mead-test
   (testing "Nelder-Mead minimisation"
@@ -49,3 +56,21 @@
     (is (test-optim (build-quadratic 5 10 1) nelder-mead/optimise [-1]  [10]))
     (is (test-optim (build-quadratic 2  4 2) nelder-mead/optimise [-1]  [-10]))
     (is (test-optim (build-quadratic 1 -4 1) nelder-mead/optimise [2]   [7.8]))))
+
+
+(deftest genetic-test
+  (testing "Genetic minimisation"
+    (is (test-optim (build-rosenbrock 1 100) genetic/optimise [1 1] [5    -1]))
+    (is (test-optim (build-rosenbrock 1 100) genetic/optimise [1 1] [0     0]))
+    (is (test-optim (build-rosenbrock 1 100) genetic/optimise [1 1] [15    2]))
+    (is (test-optim (build-rosenbrock 1 100) genetic/optimise [1 1] [-9   -9]))
+    (is (test-optim (build-rosenbrock 1 100) genetic/optimise [1 1] [5.2 1.2]))
+    (is (test-optim (build-rosenbrock 1 100) genetic/optimise [1 1] [10    2]))
+    (is (test-optim (build-rosenbrock 1 100) genetic/optimise [1 1] [-1   -1]))
+    (is (test-optim (build-quadratic 1  0 0) genetic/optimise [0]   [-1]))
+    (is (test-optim (build-quadratic 3  0 8) genetic/optimise [0]   [10]))
+    (is (test-optim (build-quadratic 1 -4 0) genetic/optimise [2]   [1000]))
+    (is (test-optim (build-quadratic 1  4 3) genetic/optimise [-2]  [-18]))
+    (is (test-optim (build-quadratic 5 10 1) genetic/optimise [-1]  [10]))
+    (is (test-optim (build-quadratic 2  4 2) genetic/optimise [-1]  [-10]))
+    (is (test-optim (build-quadratic 1 -4 1) genetic/optimise [2]   [7.8]))))
