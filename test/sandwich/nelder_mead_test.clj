@@ -7,11 +7,13 @@
 
 (defn- sq [x] (Math/pow x 2))
 
+
 (defn- build-rosenbrock
   [a b]
   (fn [[x y]]
     (+ (sq (- a x))
        (* b (sq (- y (sq x)))))))
+
 
 (defn- build-quadratic
   [a b c]
@@ -26,6 +28,7 @@
 (defn- close? [tolerance x y]
   (< (Math/abs (- x y)) tolerance))
 
+
 (defn- test-optim
   [f op x-true x0]
   (let [result (op f x0)
@@ -33,8 +36,9 @@
     (->> (mapv #(close? 0.001 %1 %2) x-true x-est)
          (every? true?))))
 
+
 (deftest nelder-mead-test
-  (testing "Nelder-Mead minimisation"
+  (testing "Nelder-Mead minimises correctly"
     (is (test-optim (build-rosenbrock 1 100) nelder-mead/optimise [1 1] [0     0]))
     (is (test-optim (build-rosenbrock 1 100) nelder-mead/optimise [1 1] [5    -1]))
     (is (test-optim (build-rosenbrock 1 100) nelder-mead/optimise [1 1] [15    2]))
@@ -48,4 +52,8 @@
     (is (test-optim (build-quadratic 1  4 3) nelder-mead/optimise [-2]  [-18]))
     (is (test-optim (build-quadratic 5 10 1) nelder-mead/optimise [-1]  [10]))
     (is (test-optim (build-quadratic 2  4 2) nelder-mead/optimise [-1]  [-10]))
-    (is (test-optim (build-quadratic 1 -4 1) nelder-mead/optimise [2]   [7.8]))))
+    (is (test-optim (build-quadratic 1 -4 1) nelder-mead/optimise [2]   [7.8])))
+  (testing "Nelder-Mead doesn't minimise incorrectly")
+    (is (not (test-optim (build-rosenbrock 1 100) nelder-mead/optimise [0 0] [0     0])))
+    (is (not (test-optim (build-rosenbrock 1 100) nelder-mead/optimise [5 5] [5    -1])))
+    (is (not (test-optim (build-rosenbrock 1 100) nelder-mead/optimise [3 2] [15    2]))))
